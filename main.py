@@ -1,5 +1,6 @@
 import pygame
 import sys
+import networktables
 
 # Initialize Pygame
 pygame.init()
@@ -11,6 +12,11 @@ pygame.display.set_caption("My First Pygame")
 
 # Image(s?)
 img = pygame.image.load("C:\\Documents\\GitHub\\Robot-Mouse-Control\\joystick.png").convert()
+
+# NT Table stuff
+nt = networktables.NetworkTablesInstance.getDefault()
+nt.startClient("127.0.0.1")
+table = nt.getTable("Mouse Joystick") 
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -37,22 +43,22 @@ def get_mouse_from_middle(x, y):
 
     elif xAmount > 0.5 and yAmount < -0.5: # mouse is in bottom right quadrant
         xAmount, yAmount = -0.5, -0.5
-    
-    else: # mouse is in normal boundaries
-        return xAmount, yAmount
+
+    # No else statement, becuase if it is in normal boundaries, we dont want to do anything to the value    
+    return (xAmount, yAmount)
 
 def return_mouse_100_pos(x, y):
     if x > 256 and x < 256 + 44 and y > 256 and y < 256 + 44:
-        print(0)
+        return (0, 0)
     else:
-        print(get_mouse_from_middle(x, y))
+        return get_mouse_from_middle(x, y)
 
 
 
 
 
 def main_loop():
-    global screen
+    global screen, table
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -64,7 +70,8 @@ def main_loop():
     draw_background(screen)
 
     mousex, mousey = pygame.mouse.get_pos()
-    return_mouse_100_pos(mousex, mousey)
+    table.putNumber("Mouse X", return_mouse_100_pos(mousex, mousey)[0])
+    table.putNumber("Mouse Y", return_mouse_100_pos(mousex, mousey)[1])
 
     # Update the display
     pygame.display.flip()
