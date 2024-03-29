@@ -6,12 +6,12 @@ import networktables
 pygame.init()
 
 # Set up the display
-screen_width, screen_height = 600, 600
+screen_width, screen_height = 1000, 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("My First Pygame")
 
 # Image(s?)
-img = pygame.image.load("C:\\Documents\\GitHub\\Robot-Mouse-Control\\joystick.png").convert()
+img = pygame.transform.scale(pygame.image.load("C:\\Documents\\GitHub\\Robot-Mouse-Control\\joystick.png"), (screen_width, screen_height)).convert()
 
 # NT Table stuff
 nt = networktables.NetworkTablesInstance.getDefault()
@@ -26,23 +26,23 @@ def draw_background(screen):
     screen.blit(img, (0, 0))
 
 def get_mouse_from_middle(x, y):
-    yPercentFrom00 = y / 300
+    yPercentFrom00 = y / (screen_height / 2)
     yAmount = 1.0 - yPercentFrom00
-    xPercentFrom00 = x / 300
+    xPercentFrom00 = x / (screen_width / 2)
     xAmount = 1.0 - xPercentFrom00
 
     # You cant have each axis going more than 50% at any time, so this handles it 
-    if xAmount > 0.5 and yAmount > 0.5: # mouse is in top left quadrant
-        xAmount, yAmount = 0.5, 0.5
+    # if xAmount > 0.5 and yAmount > 0.5: # mouse is in top left quadrant
+    #     xAmount, yAmount = 0.8, 0.8
     
-    elif xAmount < -0.5 and yAmount > 0.5: # mouse is in top right quadrant
-        xAmount, yAmount = -0.5, 0.5
+    # elif xAmount < -0.5 and yAmount > 0.5: # mouse is in top right quadrant
+    #     xAmount, yAmount = -0.8, 0.8
 
-    elif xAmount < -0.5 and yAmount < -0.5: # mouse is in bottom left quadrant
-        xAmount, yAmount = -0.5, -0.5
+    # elif xAmount < -0.5 and yAmount < -0.5: # mouse is in bottom left quadrant
+    #     xAmount, yAmount = -0.8, -0.8
 
-    elif xAmount > 0.5 and yAmount < -0.5: # mouse is in bottom right quadrant
-        xAmount, yAmount = -0.5, -0.5
+    # elif xAmount > 0.5 and yAmount < -0.5: # mouse is in bottom right quadrant
+    #     xAmount, yAmount = -0.8, -0.8
 
     # No else statement, becuase if it is in normal boundaries, we dont want to do anything to the value    
     return (xAmount, yAmount)
