@@ -2,9 +2,6 @@ import pygame
 import sys
 import networktables
 
-# Initialize Pygame
-pygame.init()
-
 # Set up the display
 screen_width, screen_height = 1000, 800
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -16,11 +13,23 @@ img = pygame.transform.scale(pygame.image.load("C:\\Documents\\GitHub\\Robot-Mou
 # NT Table stuff
 nt = networktables.NetworkTablesInstance.getDefault()
 nt.startClient("127.0.0.1")
-table = nt.getTable("Mouse Joystick") 
+table = nt.getTable("Wiimote Joystick") 
 
 # Define colors
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
+
+try:
+    wiimote=pygame.joystick.Joystick(0)
+except pygame.error: # This bit doesn't seem to work properly.
+    print("Joystick not connected.")
+
+wiimote.init()
+
+def wiimote_event_handling(wiimote):
+    wiimoteXandY = (round(wiimote.get_axis(0)), round(wiimote.get_axis(1)))
+    return wiimoteXandY
+
 
 def draw_background(screen):
     screen.blit(img, (0, 0))
@@ -37,11 +46,7 @@ def return_mouse_100_pos(x, y):
         return (0, 0)
     else:
         return get_mouse_from_middle(x, y)
-
-
-
-
-
+        
 def main_loop():
     global screen, table
 
@@ -55,8 +60,8 @@ def main_loop():
     draw_background(screen)
 
     mousex, mousey = pygame.mouse.get_pos()
-    table.putNumber("Mouse X", return_mouse_100_pos(mousex, mousey)[0])
-    table.putNumber("Mouse Y", return_mouse_100_pos(mousex, mousey)[1])
+    table.putNumber("Wiimote X", wiimote_event_handling(wiimote)[0])
+    table.putNumber("Wiimote Y", wiimote_event_handling(wiimote)[1])
 
     # Update the display
     pygame.display.flip()
